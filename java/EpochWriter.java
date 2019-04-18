@@ -11,11 +11,15 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 import org.jtransforms.fft.DoubleFFT_1D;
 
 public class EpochWriter {
 	
+        private static final ZoneId ZONE_ID = ZoneId.of("UTC"); 
+
 	private static final DecimalFormatSymbols decimalFormatSymbol = new DecimalFormatSymbols(Locale.ENGLISH);
 	private static DecimalFormat DF8 = new DecimalFormat("0.00000000", decimalFormatSymbol);
 	private static DecimalFormat DF6 = new DecimalFormat("0.000000", decimalFormatSymbol);
@@ -346,7 +350,6 @@ public class EpochWriter {
 			List<Long> timeVals /* milliseconds since start of epochStartTime */,
 			List<Double> xVals, List<Double> yVals, List<Double> zVals, List<Double> temperatureVals,
 			int[] errCounter) {		
-
 		int[] clipsCounter = new int[] { 0, 0 }; // before, after (calibration)
 		double x;
 		double y;
@@ -475,8 +478,10 @@ public class EpochWriter {
 			// temperature does not change much, so we can use the mean
 			double temp = mean(temperatureVals);
 			for (int c = 0; c < xResampled.length; c++) {
+                                ZonedDateTime dtZone = epochStartTime.plusNanos(timeResampled[c] * 1000000).atZone(ZONE_ID);
+                                long timestampMs = dtZone.toInstant().toEpochMilli();
 				writeLine(rawWriter,
-						epochStartTime.plusNanos(timeResampled[c] * 1000000).format(timeFormat)
+						timestampMs
 								+ "," + DF3.format(xResampled[c]) + "," + DF3.format(yResampled[c]) + "," + DF3.format(zResampled[c]) + "," + temp);
 			}
 		}
