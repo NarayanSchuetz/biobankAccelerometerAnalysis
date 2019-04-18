@@ -202,7 +202,7 @@ def getCalibrationCoefs(staticBoutsFile, summary):
         axesVals = staticBoutsFile[['xMean','yMean','zMean']].values
         tempVals = staticBoutsFile[['temperature']].values
     else:
-        d = np.loadtxt(open(staticBoutsFile,"rb"),delimiter=",",skiprows=1,
+        d = np.loadtxt(staticBoutsFile,delimiter=",",skiprows=1,
                 usecols=(2,3,4,11,13))
         if len(d)<=5:
             return [0.0,0.0,0.0], [1.0,1.0,1.0], [0.0,0.0,0.0], 20, np.nan, np.nan, \
